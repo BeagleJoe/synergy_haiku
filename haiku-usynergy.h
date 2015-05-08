@@ -84,6 +84,7 @@ class uSynergyInputServerDevice : public BHandler, public BInputServerDevice {
 		uint32				fControlKey;
 		char*				fFilename;
 		bool				fEnableSynergy;
+		BString				fServerKeymap;
 		BString				fServerAddress;
 
 	volatile bool			fUpdateSettings;

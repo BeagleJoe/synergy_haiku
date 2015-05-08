@@ -164,6 +164,7 @@ uSynergyInputServerDevice::uSynergyInputServerDevice()
 	fSocket(-1),
 	fEnableSynergy(false),
 	fServerAddress(NULL),
+	fServerKeymap(NULL),
 	fUpdateSettings(false),
 	fKeymapLock("synergy keymap lock")
 {
@@ -391,6 +392,7 @@ uSynergyInputServerDevice::_UpdateSettings()
 		return;
 
 	fEnableSynergy = get_driver_boolean_parameter(handle, "enable", false, false);
+	fServerKeymap = get_driver_parameter(handle, "server_keymap", NULL, NULL);
 	fServerAddress = get_driver_parameter(handle, "server", NULL, NULL);
 
 	unload_driver_settings(handle);
@@ -573,12 +575,25 @@ uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode,
 	int64 timestamp = system_time();
 
 	uint32_t keycode = 0;
-	if (scancode > 0 && scancode < sizeof(kATKeycodeMap)/sizeof(uint32))
-		keycode = kATKeycodeMap[scancode - 1];
-	else {
-		scancode = (uint8)(scancode | 0x80);
+
+	// XXX: This is a dirty hack.
+	// See https://github.com/synergy/synergy/issues/4640
+	if (fServerKeymap == "X11") {
+		if (scancode > 0 && scancode < sizeof(kXKeycodeMap)/sizeof(uint32))
+			keycode = kXKeycodeMap[scancode - 1];
+		else {
+			scancode = (uint8)(scancode | 0x80);
+			if (scancode > 0 && scancode < sizeof(kXKeycodeMap)/sizeof(uint32))
+				keycode = kXKeycodeMap[scancode - 1];
+		}
+	} else {
 		if (scancode > 0 && scancode < sizeof(kATKeycodeMap)/sizeof(uint32))
 			keycode = kATKeycodeMap[scancode - 1];
+		else {
+			scancode = (uint8)(scancode | 0x80);
+			if (scancode > 0 && scancode < sizeof(kATKeycodeMap)/sizeof(uint32))
+				keycode = kATKeycodeMap[scancode - 1];
+		}
 	}
 
 	TRACE("synergy: scancode = 0x%02x, keycode = 0x%x\n", scancode, keycode);
