@@ -527,8 +527,7 @@ uSynergyInputServerDevice::MouseCallback(uint16_t x, uint16_t y, int16_t wheelX,
 			message->AddInt32("clicks", clicks);
 			oldWhen = timestamp;
 			oldPressedButtons = buttons;
-		}
-		else
+		} else
 			clicks = 1;
 
 		if (message != NULL)
@@ -549,8 +548,10 @@ uSynergyInputServerDevice::MouseCallback(uint16_t x, uint16_t y, int16_t wheelX,
 		BMessage* message = new BMessage(B_MOUSE_WHEEL_CHANGED);
 		if (message != NULL) {
 			if (message->AddInt64("when", timestamp) == B_OK
-			    && message->AddFloat("be:wheel_delta_x", (oldWheelX - wheelX) / 120) == B_OK
-			    && message->AddFloat("be:wheel_delta_y", (oldWheelY - wheelY) / 120) == B_OK)
+				&& message->AddFloat("be:wheel_delta_x",
+					(oldWheelX - wheelX) / 120) == B_OK
+				&& message->AddFloat("be:wheel_delta_y",
+					(oldWheelY - wheelY) / 120) == B_OK)
 				EnqueueMessage(message);
 			else
 				delete message;
@@ -562,7 +563,8 @@ uSynergyInputServerDevice::MouseCallback(uint16_t x, uint16_t y, int16_t wheelX,
 
 
 void
-uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode, uint16_t _modifiers, bool isKeyDown, bool isKeyRepeat)
+uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode,
+	uint16_t _modifiers, bool isKeyDown, bool isKeyRepeat)
 {
 	static uint32 lastScanCode = 0;
 	static uint32 repeatCount = 1;
