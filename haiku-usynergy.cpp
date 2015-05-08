@@ -64,31 +64,33 @@ const static uint32 kSynergyThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
 
 // Static hook functions for uSynergy
 
-static bool
-uConnect(void* cookie)
+static uSynergyBool
+uConnect(uSynergyCookie cookie)
 {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	return device->Connect();
 }
 
 
-static bool
-uSend(void* cookie, const uint8* buffer, int length)
+static uSynergyBool
+uSend(uSynergyCookie cookie, const uint8* buffer, int length)
 {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	return device->Send(buffer, length);
 }
 
 
-static bool
-uReceive(void* cookie, uint8* buffer, int maxLength, int* outLength) {
+static uSynergyBool
+uReceive(uSynergyCookie cookie, uint8* buffer, int maxLength, int* outLength) {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
-	return (uSynergyInputServerDevice*)device->Receive(buffer, maxLength, outLength);
+	if ((uSynergyInputServerDevice*)device->Receive(buffer, maxLength, outLength))
+		return USYNERGY_TRUE;
+	return USYNERGY_FALSE;
 }
 
 
 static void
-uSleep(void* unused, int milliseconds)
+uSleep(uSynergyCookie cookie, int milliseconds)
 {
 	snooze(milliseconds * 1000);
 }
@@ -102,22 +104,23 @@ uGetTime()
 
 
 static void
-uTrace(void* cookie, const char* text) {
+uTrace(uSynergyCookie cookie, const char* text) {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	device->Trace(text);
 }
 
 
 static void
-uScreenActive(void* cookie, bool active) {
+uScreenActive(uSynergyCookie cookie, uSynergyBool active) {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	device->ScreenActive(active);
 }
 
 
 static void
-uMouseCallback(void* cookie, uint16 x, uint16 y, int16 wheelX, int16 wheelY,
-	bool buttonLeft, bool buttonRight, bool buttonMiddle)
+uMouseCallback(uSynergyCookie cookie, uint16 x, uint16 y,
+	int16 wheelX, int16 wheelY, uSynergyBool buttonLeft,
+	uSynergyBool buttonRight, uSynergyBool buttonMiddle)
 {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	device->MouseCallback(x, y, wheelX, wheelY, buttonLeft,
@@ -126,8 +129,8 @@ uMouseCallback(void* cookie, uint16 x, uint16 y, int16 wheelX, int16 wheelY,
 
 
 static void
-uKeyboardCallback(void* cookie, uint16 key, uint16 modifiers,
-	bool isKeyDown, bool isKeyRepeat)
+uKeyboardCallback(uSynergyCookie cookie, uint16 key, uint16 modifiers,
+	uSynergyBool isKeyDown, uSynergyBool isKeyRepeat)
 {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	device->KeyboardCallback(key, modifiers, isKeyDown, isKeyRepeat);
@@ -135,7 +138,7 @@ uKeyboardCallback(void* cookie, uint16 key, uint16 modifiers,
 
 
 static void
-uJoystickCallback(void* cookie, uint8_t joyNum, uint16_t buttons,
+uJoystickCallback(uSynergyCookie cookie, uint8_t joyNum, uint16_t buttons,
 	int8_t leftStickX, int8_t leftStickY, int8_t rightStickX, int8_t rightStickY)
 {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
@@ -145,7 +148,8 @@ uJoystickCallback(void* cookie, uint8_t joyNum, uint16_t buttons,
 
 
 static void
-uClipboardCallback(void* cookie, enum uSynergyClipboardFormat format, const uint8_t* data, uint32_t size)
+uClipboardCallback(uSynergyCookie cookie, enum uSynergyClipboardFormat format,
+	const uint8_t* data, uint32_t size)
 {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	device->ClipboardCallback(format, data, size);
@@ -488,7 +492,9 @@ uSynergyInputServerDevice::_BuildMouseMessage(uint32 what, uint64 when, uint32 b
 
 
 void
-uSynergyInputServerDevice::MouseCallback(uint16_t x, uint16_t y, int16_t wheelX, int16_t wheelY, uSynergyBool buttonLeft, uSynergyBool buttonRight, uSynergyBool buttonMiddle)
+uSynergyInputServerDevice::MouseCallback(uint16_t x, uint16_t y, int16_t wheelX,
+	int16_t wheelY, uSynergyBool buttonLeft, uSynergyBool buttonRight,
+	uSynergyBool buttonMiddle)
 {
 	static uint32_t			 oldButtons = 0, oldPressedButtons = 0;
 	uint32_t			 buttons = 0;

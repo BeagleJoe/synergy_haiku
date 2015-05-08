@@ -167,19 +167,6 @@ static void sSendMouseCallback(uSynergyContext *context)
 
 
 /**
-@brief Mark context as being disconnected
-**/
-static void sSetDisconnected(uSynergyContext *context)
-{
-	context->m_connected		= USYNERGY_FALSE;
-	context->m_hasReceivedHello = USYNERGY_FALSE;
-	context->m_isCaptured		= USYNERGY_FALSE;
-	context->m_replyCur			= context->m_replyBuffer + 4;
-	context->m_sequenceNumber	= 0;
-}
-
-
-/**
 @brief Send keyboard callback when a key has been pressed or released
 **/
 static void sSendKeyboardCallback(uSynergyContext *context, uint16_t key, uint16_t modifiers, uSynergyBool down, uSynergyBool repeat)
@@ -433,20 +420,13 @@ static void sProcessMessage(uSynergyContext *context, const uint8_t *message)
 			uint32_t format	= sNetToNative32(parse_msg);
 			uint32_t size	= sNetToNative32(parse_msg+4);
 			parse_msg += 8;
-
+			
 			// Call callback
 			if (context->m_clipboardCallback)
 				context->m_clipboardCallback(context->m_cookie, format, parse_msg, size);
 
 			parse_msg += size;
 		}
-	}
-	else if (USYNERGY_IS_PACKET("CBYE"))
-	{
-		// Server is closing connection
-		sSetDisconnected(context);
-		sTrace(context, "Server has quit");
-		return;
 	}
 	else
 	{
@@ -474,6 +454,19 @@ static void sProcessMessage(uSynergyContext *context, const uint8_t *message)
 }
 #undef USYNERGY_IS_PACKET
 
+
+
+/**
+@brief Mark context as being disconnected
+**/
+static void sSetDisconnected(uSynergyContext *context)
+{
+	context->m_connected		= USYNERGY_FALSE;
+	context->m_hasReceivedHello = USYNERGY_FALSE;
+	context->m_isCaptured		= USYNERGY_FALSE;
+	context->m_replyCur			= context->m_replyBuffer + 4;
+	context->m_sequenceNumber	= 0;
+}
 
 
 
@@ -619,7 +612,7 @@ void uSynergySendClipboard(uSynergyContext *context, const char *text)
 								4 +					/* Clipboard format */
 								4;					/* Clipboard data length */
 	uint32_t max_length = USYNERGY_REPLY_BUFFER_SIZE - overhead_size;
-
+	
 	// Clip text to max length
 	uint32_t text_length = (uint32_t)strlen(text);
 	if (text_length > max_length)

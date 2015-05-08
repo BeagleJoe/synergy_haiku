@@ -39,7 +39,8 @@ class uSynergyInputServerDevice : public BHandler, public BInputServerDevice {
 
 	virtual status_t		InitCheck();
 
-	virtual status_t		Control(const char* name, void* cookie, uint32 command, BMessage* message);
+	virtual status_t		Control(const char* name, void* cookie,
+								uint32 command, BMessage* message);
 	virtual status_t		Start(const char* name, void* cookie);
 	virtual status_t		Stop(const char* name, void* cookie);
 	virtual status_t		SystemShuttingDown();
@@ -49,17 +50,27 @@ class uSynergyInputServerDevice : public BHandler, public BInputServerDevice {
 	// Synergy Hooks
 		bool				Connect();
 		bool				Send(const uint8_t* buffer, int32_t length);
-		bool				Receive(uint8_t* buffer, int maxLength, int* outLength);
+		bool				Receive(uint8_t* buffer, int maxLength,
+								int* outLength);
 		void				Trace(const char* text);
 		void				ScreenActive(bool active);
-		void				MouseCallback(uint16_t x, uint16_t y, int16_t wheelX, int16_t wheelY, bool buttonLeft, bool buttonRight, bool buttonMiddle);
-		void				KeyboardCallback(uint16_t key, uint16_t modifiers, bool isKeyDown, bool isKeyRepeat);
-		void				JoystickCallback(uint8_t joyNum, uint16_t buttons, int8_t leftStickX, int8_t leftStickY, int8_t rightStickX, int8_t rightStickY);
-		void				ClipboardCallback(enum uSynergyClipboardFormat format, const uint8_t* data, uint32_t size);
+		void				MouseCallback(uint16_t x, uint16_t y,
+								int16_t wheelX, int16_t wheelY,
+								uSynergyBool buttonLeft,
+								uSynergyBool buttonRight,
+								uSynergyBool buttonMiddle);
+		void				KeyboardCallback(uint16_t key, uint16_t modifiers,
+								bool isKeyDown, bool isKeyRepeat);
+		void				JoystickCallback(uint8_t joyNum, uint16_t buttons,
+								int8_t leftStickX, int8_t leftStickY,
+								int8_t rightStickX, int8_t rightStickY);
+		void				ClipboardCallback(enum uSynergyClipboardFormat format,
+								const uint8_t* data, uint32_t size);
 
 	private:
 
-		BMessage*		_BuildMouseMessage(uint32 what, uint64 when, uint32 buttons, float x, float y) const;
+		BMessage*		_BuildMouseMessage(uint32 what, uint64 when,
+							uint32 buttons, float x, float y) const;
 		void			_UpdateSettings();
 	static status_t		_MainLoop(void* arg);
 

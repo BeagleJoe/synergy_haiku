@@ -2,7 +2,7 @@
 uSynergy client -- Interface for the embedded Synergy client library
   version 1.0.0, July 7th, 2012
 
-Copyright (C) 2012 Bolton Software Ltd.
+Copyright (C) 2012 Synergy Si Ltd.
 Copyright (c) 2012 Alex Evans
 
 This software is provided 'as-is', without any express or implied
@@ -68,15 +68,10 @@ extern "C" {
 /**
 @brief Boolean type
 **/
-#if defined(__cplusplus)
-typedef bool		uSynergyBool;
-#define				USYNERGY_FALSE					false
-#define				USYNERGY_TRUE					true
-#else
 typedef int			uSynergyBool;
 #define				USYNERGY_FALSE					0				/* False value */
 #define				USYNERGY_TRUE					1				/* True value */
-#endif
+
 
 /**
 @brief User context type
@@ -84,8 +79,7 @@ typedef int			uSynergyBool;
 The uSynergyCookie type is an opaque type that is used by uSynergy to communicate to the client. It is passed along to
 callback functions as context.
 **/
-/*typedef struct { int ignored; } *					uSynergyCookie;*/
-typedef void* uSynergyCookie;
+typedef struct { int ignored; } *					uSynergyCookie;
 
 
 
