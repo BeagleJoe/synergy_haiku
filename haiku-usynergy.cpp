@@ -1,7 +1,8 @@
 /*
  * Copyright (c)
- *      2014  Ed Robbins <edd.robbins@gmail.com>
- *      2014  Jessica Hamilton <jessica.l.hamilton@gmail.com>
+ *      2014      Ed Robbins <edd.robbins@gmail.com>
+ *      2014      Jessica Hamilton <jessica.l.hamilton@gmail.com>
+ *      2015-2016 Alexander von Gluck IV <kallisti5@unixzen.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -203,7 +204,8 @@ uSynergyInputServerDevice::uSynergyInputServerDevice()
 
 	BEntry entry(fFilename);
 
-	BPrivate::BPathMonitor::StartWatching(fFilename, B_WATCH_STAT | B_WATCH_FILES_ONLY, this);
+	BPrivate::BPathMonitor::StartWatching(fFilename,
+		B_WATCH_STAT | B_WATCH_FILES_ONLY, this);
 
 	_UpdateSettings();
 }
@@ -225,8 +227,10 @@ uSynergyInputServerDevice::InitCheck()
 {
 	input_device_ref *devices[3];
 
-	input_device_ref mouse = { (char*)"uSynergy Mouse", B_POINTING_DEVICE, (void *)this };
-	input_device_ref keyboard = { (char*)"uSynergy Keyboard", B_KEYBOARD_DEVICE, (void *)this };
+	input_device_ref mouse = { (char*)"uSynergy Mouse", B_POINTING_DEVICE,
+		(void *)this };
+	input_device_ref keyboard = { (char*)"uSynergy Keyboard", B_KEYBOARD_DEVICE,
+		(void *)this };
 
 	devices[0] = &mouse;
 	devices[1] = &keyboard;
@@ -267,7 +271,8 @@ uSynergyInputServerDevice::MessageReceived(BMessage* message)
 			BMessage *clip = NULL;
 			if (be_clipboard->Lock()) {
 				if ((clip = be_clipboard->Data()) == B_OK) {
-					clip->FindData("text/plain", B_MIME_TYPE, (const void **)&text, &len);
+					clip->FindData("text/plain", B_MIME_TYPE,
+						(const void **)&text, &len);
 				}
 				be_clipboard->Unlock();
 			}
@@ -302,7 +307,8 @@ uSynergyInputServerDevice::Start(const char* name, void* cookie)
 		return B_OK;
 	}
 
-	uSynergyThread = spawn_thread(_MainLoop, threadName, kSynergyThreadPriority, (void*)this);
+	uSynergyThread = spawn_thread(_MainLoop, threadName, kSynergyThreadPriority,
+		(void*)this);
 
 	if (uSynergyThread < 0) {
 		threadActive = false;
@@ -346,7 +352,8 @@ uSynergyInputServerDevice::SystemShuttingDown()
 
 
 status_t
-uSynergyInputServerDevice::Control(const char* name, void* cookie, uint32 command, BMessage* message)
+uSynergyInputServerDevice::Control(const char* name, void* cookie,
+	uint32 command, BMessage* message)
 {
 	if (command == B_KEY_MAP_CHANGED) {
 		fUpdateSettings = true;
@@ -419,14 +426,15 @@ uSynergyInputServerDevice::Connect()
 		goto exit;
 	}
 
-	if (connect(fSocket, (struct sockaddr*)&server, sizeof(struct sockaddr)) < 0 ) {
+	if (connect(fSocket, (struct sockaddr*)&server,
+			sizeof(struct sockaddr)) < 0 ) {
 		TRACE("synergy: %s: %x\n", "failed to connect to remote host", errno);
 		close(fSocket);
 		fSocket = -1;
 		goto exit;
-	}
-	else
+	} else
 		return true;
+
 exit:
 	snooze(1000000);
 	return false;
@@ -475,16 +483,17 @@ uSynergyInputServerDevice::ScreenActive(bool active)
 
 
 BMessage*
-uSynergyInputServerDevice::_BuildMouseMessage(uint32 what, uint64 when, uint32 buttons, float x, float y) const
+uSynergyInputServerDevice::_BuildMouseMessage(uint32 what, uint64 when,
+	uint32 buttons, float x, float y) const
 {
 	BMessage* message = new BMessage(what);
 	if (message == NULL)
 		return NULL;
 
 	if (message->AddInt64("when", when) < B_OK
-	    || message->AddInt32("buttons", buttons) < B_OK
-	    || message->AddFloat("x", x) < B_OK
-	    || message->AddFloat("y", y) < B_OK) {
+		|| message->AddInt32("buttons", buttons) < B_OK
+		|| message->AddFloat("x", x) < B_OK
+		|| message->AddFloat("y", y) < B_OK) {
 		delete message;
 		return NULL;
 	}
@@ -539,7 +548,8 @@ uSynergyInputServerDevice::MouseCallback(uint16_t x, uint16_t y, int16_t wheelX,
 	}
 
 	if ((x != oldX) || (y != oldY)) {
-		BMessage* message = _BuildMouseMessage(B_MOUSE_MOVED, timestamp, buttons, xVal, yVal);
+		BMessage* message = _BuildMouseMessage(B_MOUSE_MOVED, timestamp,
+			buttons, xVal, yVal);
 		if (message != NULL)
 			EnqueueMessage(message);
 		oldX = x;
@@ -642,14 +652,16 @@ uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode,
 			if (message == NULL)
 				return;
 
-			TRACE("synergy: modifiers: 0x%04" B_PRIx32 " & 0x%04" B_PRIx32 "\n", modifiers, fModifiers);
+			TRACE("synergy: modifiers: 0x%04" B_PRIx32 " & 0x%04" B_PRIx32 "\n",
+				modifiers, fModifiers);
 
 			if (isKeyDown)
 				modifiers |= fModifiers;
 			else
 				modifiers &= ~fModifiers;
 
-			TRACE("synergy: modifiers changed: 0x%04" B_PRIx32 " => 0x%04" B_PRIx32 "\n", fModifiers, modifiers);
+			TRACE("synergy: modifiers changed: 0x%04" B_PRIx32 " => 0x%04"
+				B_PRIx32 "\n", fModifiers, modifiers);
 
 			message->AddInt64("when", timestamp);
 			message->AddInt32("be:old_modifiers", fModifiers);
@@ -721,13 +733,16 @@ uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode,
 
 
 void
-uSynergyInputServerDevice::JoystickCallback(uint8_t joyNum, uint16_t buttons, int8_t leftStickX, int8_t leftStickY, int8_t rightStickX, int8_t rightStickY)
+uSynergyInputServerDevice::JoystickCallback(uint8_t joyNum, uint16_t buttons,
+	int8_t leftStickX, int8_t leftStickY,
+	int8_t rightStickX, int8_t rightStickY)
 {
 }
 
 
 void
-uSynergyInputServerDevice::ClipboardCallback(enum uSynergyClipboardFormat format, const uint8_t *data, uint32_t size)
+uSynergyInputServerDevice::ClipboardCallback(enum uSynergyClipboardFormat format,
+	const uint8_t *data, uint32_t size)
 {
 	if (format != USYNERGY_CLIPBOARD_FORMAT_TEXT)
 		return;
