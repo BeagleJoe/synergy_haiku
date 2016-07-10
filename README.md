@@ -1,5 +1,7 @@
 # Synergy for Haiku
 
+![Synergy for Haiku](SynergyHaiku.png "Synergy for Haiku")
+
 Synergy for Haiku is a [Synergy](http://symless.com) client for the [Haiku Operating System](http://haiku-os.org).
 
 Synergy allows a central machine running the Synergy server to share its Keyboard and Mouse across multiple systems running the client as if they were one desktop.
