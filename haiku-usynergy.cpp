@@ -21,6 +21,7 @@
 #include <Bitmap.h>
 #include <Clipboard.h>
 #include <FindDirectory.h>
+#include <IconUtils.h>
 #include <Mime.h>
 #include <NodeMonitor.h>
 #include <Notification.h>
@@ -28,6 +29,7 @@
 #include <Path.h>
 #include <PathFinder.h>
 #include <PathMonitor.h>
+#include <Resources.h>
 #include <Screen.h>
 #include <TranslationUtils.h>
 
@@ -58,6 +60,19 @@
 #endif
 
 #define FILE_UPDATED 'fiUp'
+
+static status_t
+our_image(image_info& image)
+{
+	int32 cookie = 0;
+	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &image) == B_OK) {
+		if ((char *)our_image >= (char *)image.text
+			&& (char *)our_image <= (char *)image.text + image.text_size)
+			return B_OK;
+	}
+
+	return B_ERROR;
+}
 
 
 const static uint32 kSynergyThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
@@ -468,9 +483,30 @@ uSynergyInputServerDevice::Trace(const char *text)
 
 	notify.SetGroup(group);
 	notify.SetContent(content);
-	BBitmap* bitmap = BTranslationUtils::GetBitmap("/boot/home/config/non-packaged/data/synergy-32.png");
-	if (bitmap != NULL)
+
+	image_info info;
+	if (our_image(info) != B_OK)
+		return;
+
+	BFile file(info.name, B_READ_ONLY);
+	if (file.InitCheck() < B_OK)
+		return;
+
+	BResources res(&file);
+	size_t size;
+	const void* data = res.LoadResource(B_VECTOR_ICON_TYPE, "icon", &size);
+
+	if (!data) {
+		TRACE("Unable to load resource for notification!");
+		notify.Send();
+		return;
+	}
+
+	BBitmap* bitmap = new BBitmap(BRect(0, 0, 32, 32), B_RGBA32);
+	status_t status = BIconUtils::GetVectorIcon((uint8*)data, size, bitmap);
+	if (status == B_OK)
 		notify.SetIcon(bitmap);
+
 	notify.Send();
 	delete bitmap;
 }
