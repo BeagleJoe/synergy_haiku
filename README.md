@@ -31,3 +31,17 @@ Simply run ```make``` under Haiku
   
 ## Manual Installation
 Copy the synergy_client input add-on to the non-packaged add-ons directory ```~/config/non-packaged/add-ons/input_server/devices/```
+
+## License
+
+Synergy for Haiku is released under the same license as uSynergy (MIT)
+
+## Thanks
+
+Thanks to all of those individuals who have made major contributions to Synergy for Haiku.
+
+* Axel Dörfler (ATKeymap)
+* Stefano Ceccherini (wrapper)
+* Ed Robbins (wrapper)
+* Jessica Hamilton (wrapper)
+* Alex Evans (uSynergy)
