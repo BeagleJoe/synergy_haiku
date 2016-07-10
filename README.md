@@ -42,6 +42,7 @@ Thanks to all of those individuals who have made major contributions to Synergy 
 
 * Axel Dörfler (ATKeymap)
 * Stefano Ceccherini (wrapper)
-* Ed Robbins (wrapper)
-* Jessica Hamilton (wrapper)
+* Jérôme Duval (Keymap)
 * Alex Evans (uSynergy)
+* Jessica Hamilton (wrapper)
+* Ed Robbins (wrapper)
