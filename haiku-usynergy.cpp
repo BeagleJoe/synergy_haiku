@@ -212,7 +212,7 @@ uSynergyInputServerDevice::uSynergyInputServerDevice()
 
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK)
-		path.Append("synergy_settings");
+		path.Append("synergy");
 
 	fFilename = new char[strlen(path.Path()) + 1];
 	strcpy(fFilename, path.Path());

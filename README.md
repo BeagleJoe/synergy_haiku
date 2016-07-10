@@ -9,17 +9,14 @@ Synergy allows a central machine running the Synergy server to share its Keyboar
 ## Limitations
   - Synergy for Haiku is only a Synergy client at this time
   - Some minor bugs still exist in the keymap translation
-
-## Features
-  - Import and save files from GitHub, Dropbox, Google Drive and One Drive
-  - Drag and drop files into Dillinger
-  - Export documents as Markdown, HTML and PDF
+  - For now, client name is always "haiku"
+  - SSL / TLS is not currently supported and must be disabled on the server
 
 ## Compiling
 Simply run ```make``` under Haiku
 
 ## Configuration
-  Create a configuration file at ```~/config/settings/synergy_settings```
+  Create a configuration file at ```~/config/settings/synergy```
   
   ```ini
   enable = true
@@ -29,7 +26,7 @@ Simply run ```make``` under Haiku
 ### Options
   * **Enable**: Enable the client (true|false)
   * **Server**: Server address
-  * **Server_keymap**: Keymap of the Synergy Server (X11)
+  * **Server_keymap**: Keymap of the Synergy Server (X11|AT)
   
 ## Manual Installation
 Copy the synergy_client input add-on to the non-packaged add-ons directory ```~/config/non-packaged/add-ons/input_server/devices/```
