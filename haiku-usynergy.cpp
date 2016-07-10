@@ -181,6 +181,7 @@ uSynergyInputServerDevice::uSynergyInputServerDevice()
 	fEnableSynergy(false),
 	fServerAddress(NULL),
 	fServerKeymap(NULL),
+	fClientName(DEFAULT_NAME),
 	fUpdateSettings(false),
 	fKeymapLock("synergy keymap lock")
 {
@@ -198,7 +199,7 @@ uSynergyInputServerDevice::uSynergyInputServerDevice()
 	fContext->m_traceFunc				= uTrace;
 	fContext->m_joystickCallback		= uJoystickCallback;
 	fContext->m_clipboardCallback		= uClipboardCallback;
-	fContext->m_clientName				= "haiku";
+	fContext->m_clientName				= fClientName;
 	fContext->m_cookie					= (uSynergyCookie)this;
 
 	BRect screenRect = BScreen().Frame();
@@ -416,6 +417,7 @@ uSynergyInputServerDevice::_UpdateSettings()
 	fEnableSynergy = get_driver_boolean_parameter(handle, "enable", false, false);
 	fServerKeymap = get_driver_parameter(handle, "server_keymap", NULL, NULL);
 	fServerAddress = get_driver_parameter(handle, "server", NULL, NULL);
+	fClientName = get_driver_parameter(handle, "client_name", DEFAULT_NAME, DEFAULT_NAME);
 
 	unload_driver_settings(handle);
 }

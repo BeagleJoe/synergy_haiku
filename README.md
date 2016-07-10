@@ -24,9 +24,10 @@ Simply run ```make``` under Haiku
   server_keymap = "X11"
   ```
 ### Options
-  * **Enable**: Enable the client (true|false)
-  * **Server**: Server address
-  * **Server_keymap**: Keymap of the Synergy Server (X11|AT)
+  * **enable**: Enable the client (true|false)
+  * **server**: Server address
+  * **server_keymap**: Keymap of the Synergy Server (X11|AT)
+  * **client_name**: Name of client (string, "haiku" default)
   
 ## Manual Installation
 Copy the synergy_client input add-on to the non-packaged add-ons directory ```~/config/non-packaged/add-ons/input_server/devices/```

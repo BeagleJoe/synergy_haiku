@@ -32,6 +32,9 @@
 #include "uSynergy.h"
 
 
+#define DEFAULT_NAME "haiku"
+
+
 class uSynergyInputServerDevice : public BHandler, public BInputServerDevice {
 	public:
 							uSynergyInputServerDevice();
@@ -86,6 +89,7 @@ class uSynergyInputServerDevice : public BHandler, public BInputServerDevice {
 		bool				fEnableSynergy;
 		BString				fServerKeymap;
 		BString				fServerAddress;
+		BString				fClientName;
 
 	volatile bool			fUpdateSettings;
 
