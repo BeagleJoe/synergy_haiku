@@ -282,7 +282,7 @@ uSynergyInputServerDevice::MessageReceived(BMessage* message)
 		}
 		case B_CLIPBOARD_CHANGED:
 		{
-			const char *text = NULL;
+			/*const char *text = NULL;
 			ssize_t len = 0;
 			BMessage *clip = NULL;
 			if (be_clipboard->Lock()) {
@@ -296,7 +296,7 @@ uSynergyInputServerDevice::MessageReceived(BMessage* message)
 				uSynergySendClipboard(fContext, text);
 				TRACE("synergy: data added to clipboard\n");
 			} else
-				TRACE("synergy: couldn't add data to clipboard\n");
+				TRACE("synergy: couldn't add data to clipboard\n");*/
 		}
 		default:
 			BHandler::MessageReceived(message);
