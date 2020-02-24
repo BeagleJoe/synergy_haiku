@@ -282,21 +282,21 @@ uSynergyInputServerDevice::MessageReceived(BMessage* message)
 		}
 		case B_CLIPBOARD_CHANGED:
 		{
-			/*const char *text = NULL;
+			const char *text = NULL;
 			ssize_t len = 0;
 			BMessage *clip = NULL;
 			if (be_clipboard->Lock()) {
-				if ((clip = be_clipboard->Data()) == B_OK) {
+				/*if ((clip = be_clipboard->Data()) == B_OK) {
 					clip->FindData("text/plain", B_MIME_TYPE,
 						(const void **)&text, &len);
-				}
+				}*/
 				be_clipboard->Unlock();
 			}
 			if (len > 0 && text != NULL) {
 				uSynergySendClipboard(fContext, text);
 				TRACE("synergy: data added to clipboard\n");
 			} else
-				TRACE("synergy: couldn't add data to clipboard\n");*/
+				TRACE("synergy: couldn't add data to clipboard\n");
 		}
 		default:
 			BHandler::MessageReceived(message);

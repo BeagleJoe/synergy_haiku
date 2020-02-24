@@ -345,7 +345,7 @@ const static uint32 kXKeycodeMap[] = {
 	0x31, // [
 	0x32, // ]
 	0x47, // <ent>
-	0x5c, // Left Control
+	0x5d, // Left Control
 	0x3c, // A
 	0x3d, // S
 	0x3e, // D
@@ -372,7 +372,7 @@ const static uint32 kXKeycodeMap[] = {
 	0x55, // /
 	0x56, // Right Shift
 	0x24, // *
-	0x5d, // Left Alt
+	0x5c, // Left Alt
 	0x5e, // Space
 	0x3b, // Caps
 	0x02, // F1
@@ -428,17 +428,6 @@ const static uint32 kXKeycodeMap[] = {
 	0x00, // Next	
 	0x1f, // Insert
 	0x34, // Delete
-	0x00, // unused
-	0x00, // unused
-	0x00, // unused
-	0x00, // unused
-	0x00, // unused
-	0x00, // unused
-	0x00, // unused
-	0x00, // unused
-	0x00, // unused
-	0x00, // unused
-	0x00, // unused
 	0x00, // unused
 };
 
