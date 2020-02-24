@@ -433,6 +433,13 @@ const static uint32 kXKeycodeMap[] = {
 	0x00, // unused
 	0x00, // unused
 	0x00, // unused
+	0x00, // unused
+	0x00, // unused
+	0x00, // unused
+	0x00, // unused
+	0x00, // unused
+	0x00, // unused
+	0x00, // unused
 };
 
 
