@@ -287,11 +287,11 @@ uSynergyInputServerDevice::MessageReceived(BMessage* message)
 			BMessage *clip = NULL;
 			if (be_clipboard->Lock()) {
 				clip = be_clipboard->Data();
-				if (clip != NULL) {
+				/*if (clip != NULL) {
 					clip->FindData("text/plain", B_MIME_TYPE,
 						(const void **)&text, &len);
 				}
-				be_clipboard->Unlock();
+				be_clipboard->Unlock();*/
 			}
 			if (len > 0 && text != NULL) {
 				uSynergySendClipboard(fContext, text);
