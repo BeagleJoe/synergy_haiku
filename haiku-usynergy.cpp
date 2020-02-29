@@ -279,17 +279,18 @@ uSynergyInputServerDevice::MessageReceived(BMessage* message)
 				Stop(NULL, NULL);
 			Start(NULL, NULL);
 			break;
-		}
+		} 
 		case B_CLIPBOARD_CHANGED:
 		{
 			const char *text = NULL;
 			ssize_t len = 0;
 			BMessage *clip = NULL;
 			if (be_clipboard->Lock()) {
-				/*if ((clip = be_clipboard->Data()) == B_OK) {
+				clip = be_clipboard->Data();
+				if (clip != NULL) {
 					clip->FindData("text/plain", B_MIME_TYPE,
 						(const void **)&text, &len);
-				}*/
+				}
 				be_clipboard->Unlock();
 			}
 			if (len > 0 && text != NULL) {
