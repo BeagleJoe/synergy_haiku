@@ -61,8 +61,7 @@
 
 #define FILE_UPDATED 'fiUp'
 
-static status_t
-our_image(image_info& image)
+static status_t our_image(image_info& image)
 {
 	int32 cookie = 0;
 	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &image) == B_OK) {
@@ -79,63 +78,47 @@ const static uint32 kSynergyThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
 
 
 // Static hook functions for uSynergy
-
-static uSynergyBool
-uConnect(uSynergyCookie cookie)
+static uSynergyBool uConnect(uSynergyCookie cookie)
 {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	return device->Connect();
 }
 
-
-static uSynergyBool
-uSend(uSynergyCookie cookie, const uint8* buffer, int length)
+static uSynergyBool uSend(uSynergyCookie cookie, const uint8* buffer, int length)
 {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	return device->Send(buffer, length);
 }
 
-
-static uSynergyBool
-uReceive(uSynergyCookie cookie, uint8* buffer, int maxLength, int* outLength) {
+static uSynergyBool uReceive(uSynergyCookie cookie, uint8* buffer, int maxLength, int* outLength) {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	if ((uSynergyInputServerDevice*)device->Receive(buffer, maxLength, outLength))
 		return USYNERGY_TRUE;
-	return USYNERGY_FALSE;
+	return USYNERGY_FALSE; 
 }
 
-
-static void
-uSleep(uSynergyCookie cookie, int milliseconds)
+static void uSleep(uSynergyCookie cookie, int milliseconds)
 {
 	snooze(milliseconds * 1000);
 }
 
-
-static uint32_t
-uGetTime()
+static uint32_t uGetTime()
 {
 	return system_time() / 1000;
 }
 
-
-static void
-uTrace(uSynergyCookie cookie, const char* text) {
+static void uTrace(uSynergyCookie cookie, const char* text) {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	device->Trace(text);
 }
 
-
-static void
-uScreenActive(uSynergyCookie cookie, uSynergyBool active) {
+static void uScreenActive(uSynergyCookie cookie, uSynergyBool active) {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	device->ScreenActive(active);
 }
 
 
-static void
-uMouseCallback(uSynergyCookie cookie, uint16 x, uint16 y,
-	int16 wheelX, int16 wheelY, uSynergyBool buttonLeft,
+static void uMouseCallback(uSynergyCookie cookie, uint16 x, uint16 y, int16 wheelX, int16 wheelY, uSynergyBool buttonLeft,
 	uSynergyBool buttonRight, uSynergyBool buttonMiddle)
 {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
@@ -143,18 +126,14 @@ uMouseCallback(uSynergyCookie cookie, uint16 x, uint16 y,
 		buttonRight, buttonMiddle);
 }
 
-
-static void
-uKeyboardCallback(uSynergyCookie cookie, uint16 key, uint16 modifiers,
-	uSynergyBool isKeyDown, uSynergyBool isKeyRepeat)
+static void uKeyboardCallback(uSynergyCookie cookie, uint16 key, uint16 modifiers, uSynergyBool isKeyDown, uSynergyBool isKeyRepeat)
 {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	device->KeyboardCallback(key, modifiers, isKeyDown, isKeyRepeat);
 }
 
 
-static void
-uJoystickCallback(uSynergyCookie cookie, uint8_t joyNum, uint16_t buttons,
+static void uJoystickCallback(uSynergyCookie cookie, uint8_t joyNum, uint16_t buttons,
 	int8_t leftStickX, int8_t leftStickY, int8_t rightStickX, int8_t rightStickY)
 {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
@@ -163,8 +142,7 @@ uJoystickCallback(uSynergyCookie cookie, uint8_t joyNum, uint16_t buttons,
 }
 
 
-static void
-uClipboardCallback(uSynergyCookie cookie, enum uSynergyClipboardFormat format,
+static void uClipboardCallback(uSynergyCookie cookie, enum uSynergyClipboardFormat format,
 	const uint8_t* data, uint32_t size)
 {
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
@@ -182,6 +160,7 @@ uSynergyInputServerDevice::uSynergyInputServerDevice()
 	fServerAddress(NULL),
 	fServerKeymap(NULL),
 	fClientName(DEFAULT_NAME),
+	fEnableCLipboard(false),
 	fUpdateSettings(false),
 	fKeymapLock("synergy keymap lock")
 {
@@ -238,8 +217,7 @@ uSynergyInputServerDevice::~uSynergyInputServerDevice()
 }
 
 
-status_t
-uSynergyInputServerDevice::InitCheck()
+status_t uSynergyInputServerDevice::InitCheck()
 {
 	input_device_ref *devices[3];
 
@@ -258,16 +236,14 @@ uSynergyInputServerDevice::InitCheck()
 }
 
 
-void
-uSynergyInputServerDevice::MessageReceived(BMessage* message)
+void uSynergyInputServerDevice::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_PATH_MONITOR:
 		{
 			const char* path = "";
 			// only fall through for appropriate file
-			if (!(message->FindString("path", &path) == B_OK
-					&& strcmp(path, fFilename) == 0)) {
+			if (!(message->FindString("path", &path) == B_OK && strcmp(path, fFilename) == 0)) {
 				break; // not the file we're looking for
 			}
 		}
@@ -282,22 +258,27 @@ uSynergyInputServerDevice::MessageReceived(BMessage* message)
 		} 
 		case B_CLIPBOARD_CHANGED:
 		{
-			const char *text = NULL;
-			ssize_t len = 0;
-			BMessage *clip = NULL;
-			if (be_clipboard->Lock()) {
-				clip = be_clipboard->Data();
-				/*if (clip != NULL) {
-					clip->FindData("text/plain", B_MIME_TYPE,
-						(const void **)&text, &len);
+			// BUG #4735, in old synergy servers the feature returns "ERROR: invalid message from client: DCLP". 
+			// Disabled by default.
+			if(fEnableCLipboard == true) 
+			{
+				const char *text = NULL;
+				ssize_t len = 0;
+				BMessage *clip = NULL;
+				if (be_clipboard->Lock()) {
+					clip = be_clipboard->Data();
+					if (clip != NULL) {
+						clip->FindData("text/plain", B_MIME_TYPE, (const void **)&text, &len);
+						//Trace(text);
+					}
+					be_clipboard->Unlock();
 				}
-				be_clipboard->Unlock();*/
+				if (len > 0 && text != NULL) {
+					uSynergySendClipboard(fContext, text);
+					TRACE("synergy: data added to clipboard\n");
+				} else
+					TRACE("synergy: couldn't add data to clipboard\n");
 			}
-			if (len > 0 && text != NULL) {
-				uSynergySendClipboard(fContext, text);
-				TRACE("synergy: data added to clipboard\n");
-			} else
-				TRACE("synergy: couldn't add data to clipboard\n");
 		}
 		default:
 			BHandler::MessageReceived(message);
@@ -305,8 +286,7 @@ uSynergyInputServerDevice::MessageReceived(BMessage* message)
 }
 
 
-status_t
-uSynergyInputServerDevice::Start(const char* name, void* cookie)
+status_t uSynergyInputServerDevice::Start(const char* name, void* cookie)
 {
 	if (fServerAddress.Length() == 0 || fEnableSynergy == false) {
 		TRACE("synergy: not enabled, or no server specified\n");
@@ -340,8 +320,7 @@ uSynergyInputServerDevice::Start(const char* name, void* cookie)
 }
 
 
-status_t
-uSynergyInputServerDevice::Stop(const char* name, void* cookie)
+status_t uSynergyInputServerDevice::Stop(const char* name, void* cookie)
 {
 	threadActive = false;
 	// this will stop the thread as soon as it reads the next packet
@@ -359,8 +338,7 @@ uSynergyInputServerDevice::Stop(const char* name, void* cookie)
 }
 
 
-status_t
-uSynergyInputServerDevice::SystemShuttingDown()
+status_t uSynergyInputServerDevice::SystemShuttingDown()
 {
 	threadActive = false;
 
@@ -368,8 +346,7 @@ uSynergyInputServerDevice::SystemShuttingDown()
 }
 
 
-status_t
-uSynergyInputServerDevice::Control(const char* name, void* cookie,
+status_t uSynergyInputServerDevice::Control(const char* name, void* cookie,
 	uint32 command, BMessage* message)
 {
 	if (command == B_KEY_MAP_CHANGED) {
@@ -381,8 +358,7 @@ uSynergyInputServerDevice::Control(const char* name, void* cookie,
 }
 
 
-status_t
-uSynergyInputServerDevice::_MainLoop(void* arg)
+status_t uSynergyInputServerDevice::_MainLoop(void* arg)
 {
 	uSynergyInputServerDevice *inputDevice = (uSynergyInputServerDevice*)arg;
 
@@ -402,8 +378,7 @@ uSynergyInputServerDevice::_MainLoop(void* arg)
 }
 
 
-void
-uSynergyInputServerDevice::_UpdateSettings()
+void uSynergyInputServerDevice::_UpdateSettings()
 {
 	BAutolock lock(fKeymapLock);
 	fKeymap.RetrieveCurrent();
@@ -419,13 +394,13 @@ uSynergyInputServerDevice::_UpdateSettings()
 	fServerKeymap = get_driver_parameter(handle, "server_keymap", NULL, NULL);
 	fServerAddress = get_driver_parameter(handle, "server", NULL, NULL);
 	fClientName = get_driver_parameter(handle, "client_name", DEFAULT_NAME, DEFAULT_NAME);
+	fEnableCLipboard = get_driver_boolean_parameter(handle, "enableCLipboard", false, false); //Get the config variable and set the value. Default is false!
 
 	unload_driver_settings(handle);
 }
 
 
-bool
-uSynergyInputServerDevice::Connect()
+bool uSynergyInputServerDevice::Connect()
 {
 	if (fServerAddress.Length() == 0 || fEnableSynergy == false)
 		goto exit;
@@ -468,8 +443,7 @@ uSynergyInputServerDevice::Send(const uint8_t* buffer, int32_t length)
 }
 
 
-bool
-uSynergyInputServerDevice::Receive(uint8_t *buffer, int maxLength, int* outLength)
+bool uSynergyInputServerDevice::Receive(uint8_t *buffer, int maxLength, int* outLength)
 {
 	if ((*outLength = recv(fSocket, buffer, maxLength, 0)) == -1)
 		return false;
@@ -477,8 +451,7 @@ uSynergyInputServerDevice::Receive(uint8_t *buffer, int maxLength, int* outLengt
 }
 
 
-void
-uSynergyInputServerDevice::Trace(const char *text)
+void uSynergyInputServerDevice::Trace(const char *text)
 {
 	BNotification notify(B_INFORMATION_NOTIFICATION);
 	BString group("Synergy");
@@ -515,15 +488,12 @@ uSynergyInputServerDevice::Trace(const char *text)
 }
 
 
-void
-uSynergyInputServerDevice::ScreenActive(bool active)
+void uSynergyInputServerDevice::ScreenActive(bool active)
 {
 }
 
 
-BMessage*
-uSynergyInputServerDevice::_BuildMouseMessage(uint32 what, uint64 when,
-	uint32 buttons, float x, float y) const
+BMessage* uSynergyInputServerDevice::_BuildMouseMessage(uint32 what, uint64 when, uint32 buttons, float x, float y) const
 {
 	BMessage* message = new BMessage(what);
 	if (message == NULL)
@@ -541,8 +511,7 @@ uSynergyInputServerDevice::_BuildMouseMessage(uint32 what, uint64 when,
 }
 
 
-void
-uSynergyInputServerDevice::MouseCallback(uint16_t x, uint16_t y, int16_t wheelX,
+void uSynergyInputServerDevice::MouseCallback(uint16_t x, uint16_t y, int16_t wheelX,
 	int16_t wheelY, uSynergyBool buttonLeft, uSynergyBool buttonRight,
 	uSynergyBool buttonMiddle)
 {
@@ -613,9 +582,7 @@ uSynergyInputServerDevice::MouseCallback(uint16_t x, uint16_t y, int16_t wheelX,
 }
 
 
-void
-uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode,
-	uint16_t _modifiers, bool isKeyDown, bool isKeyRepeat)
+void uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode, uint16_t _modifiers, bool isKeyDown, bool isKeyRepeat)
 {
 	static uint32 lastScanCode = 0;
 	static uint32 repeatCount = 1;
@@ -653,6 +620,10 @@ uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode,
 		else
 			states[(keycode) >> 3] &= (!(1 << (7 - (keycode & 0x7))));
 	}
+	else
+	{
+		Trace("keycode invalid"); 
+	}
 
 #if false
 	if (isKeyDown && keycode == 0x34 // DELETE KEY
@@ -683,25 +654,29 @@ uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode,
 	if (_modifiers & USYNERGY_MODIFIER_SCROLLOCK)
 		modifiers |= B_SCROLL_LOCK;
 
-	//bool isLock
-	//	= (modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)) != 0;
+	bool isLock	= (modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)) != 0;
+	
 	if (!isKeyRepeat) {
 		if (fModifiers != modifiers) {
 			BMessage* message = new BMessage(B_MODIFIERS_CHANGED);
 			if (message == NULL)
 				return;
-
+			
 			TRACE("synergy: modifiers: 0x%04" B_PRIx32 " & 0x%04" B_PRIx32 "\n",
 				modifiers, fModifiers);
-
+				
 			if (isKeyDown)
+			{
 				modifiers |= fModifiers;
+			}
 			else
+			{
 				modifiers &= ~fModifiers;
+			}
 
 			TRACE("synergy: modifiers changed: 0x%04" B_PRIx32 " => 0x%04"
 				B_PRIx32 "\n", fModifiers, modifiers);
-
+				
 			message->AddInt64("when", timestamp);
 			message->AddInt32("be:old_modifiers", fModifiers);
 			message->AddInt32("modifiers", modifiers);
@@ -709,10 +684,10 @@ uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode,
 
 			fModifiers = modifiers;
 
-			if (EnqueueMessage(message) != B_OK)
-				delete message;
+			//if (EnqueueMessage(message) != B_OK)
+			//	delete message;
 		}
-	}
+	} 
 
 	if (scancode == 0)
 		return;
@@ -725,12 +700,13 @@ uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode,
 	char* rawString = NULL;
 	int32 numBytes = 0, rawNumBytes = 0;
 	fKeymap.GetChars(keycode, fModifiers, 0, &string, &numBytes);
-	fKeymap.GetChars(keycode, 0, 0, &rawString, &rawNumBytes);
 
 	if (numBytes > 0)
 		msg->what = isKeyDown ? B_KEY_DOWN : B_KEY_UP;
 	else
 		msg->what = isKeyDown ? B_UNMAPPED_KEY_DOWN : B_UNMAPPED_KEY_UP;
+
+	fKeymap.GetChars(keycode, 0, 0, &rawString, &rawNumBytes);
 
 	msg->AddInt64("when", timestamp);
 	msg->AddInt32("key", keycode);

@@ -90,6 +90,7 @@ class uSynergyInputServerDevice : public BHandler, public BInputServerDevice {
 		BString				fServerKeymap;
 		BString				fServerAddress;
 		BString				fClientName;
+		bool				fEnableCLipboard;
 
 	volatile bool			fUpdateSettings;
 
