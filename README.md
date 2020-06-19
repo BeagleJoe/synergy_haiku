@@ -54,5 +54,5 @@ Thanks to all of those individuals who have made major contributions to Synergy 
 * Alex Evans (uSynergy)
 * Jessica Hamilton (wrapper)
 * Ed Robbins (wrapper)
-* and the HaikuPorts team!
+* Nahuel Tello (fixes & hpkg)
 
