@@ -1,4 +1,4 @@
-# Synergy-client for Haiku-OS
+# Synergy client for Haiku-OS
 
 ![Synergy for Haiku](SynergyHaiku.png "Synergy for Haiku")
 
@@ -7,7 +7,7 @@ Synergy for Haiku is a [Synergy](http://symless.com) client for the [Haiku Opera
 Synergy allows a central machine running the Synergy server to share its Keyboard and Mouse across multiple systems running the client as if they were one desktop.
 
 ## Release notes 0.3-1
-  - Fixed x86-64
+  - Fixed x86-64 architecture compilation
   - enabel/disable copy&paste feature
   - Bugs in Key Mapping (cntrl+alt+arrows) for x11
   - sticky keys
@@ -16,9 +16,9 @@ Synergy allows a central machine running the Synergy server to share its Keyboar
 Package available: https://depot.haiku-os.org/ or in HaikuDepot app.
 
 ## Limitations
-  - Synergy for Haiku is only a Synergy client at this time
+  - Synergy for Haiku is only a Synergy client
   - SSL / TLS is not currently supported and must be disabled on the server
-  - Copy / Paste feature have some issues
+  - Copy / Paste feature have some issues; disable it is recommended 
 
 ## Compiling
 Simply run ```make``` under Haiku (x86 and x86-64 tested)
@@ -37,7 +37,7 @@ Simply run ```make``` under Haiku (x86 and x86-64 tested)
   * **server**: Server address
   * **server_keymap**: Keymap of the Synergy Server (X11|AT)
   * **client_name**: Name of client (string, "haiku" default)
-  * **enableCLipboard**: Enable/Disable copy paste feature (false recomended)
+  * **enableCLipboard**: Enable/Disable copy paste feature (false recomended / true as default)
   
 ## Manual Installation
 Copy the synergy_client input add-on to the non-packaged add-ons directory ```~/config/non-packaged/add-ons/input_server/devices/```
