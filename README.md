@@ -1,4 +1,4 @@
-# Synergy for Haiku
+# Synergy-Client for Haiku
 
 ![Synergy for Haiku](SynergyHaiku.png "Synergy for Haiku")
 
