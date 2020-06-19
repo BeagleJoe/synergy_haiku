@@ -8,7 +8,7 @@ Synergy allows a central machine running the Synergy server to share its Keyboar
 
 ## Release notes 0.3-1
   - Fixed x86-64
-  - enabel/disable copy&paste feture
+  - enabel/disable copy&paste feature
   - Key Mapping (cntrl+alt+arrows) for x11
   - sticky keys
 
