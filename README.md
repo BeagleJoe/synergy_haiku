@@ -17,7 +17,6 @@ Package available: https://depot.haiku-os.org/ or in HaikuDepot app.
 
 ## Limitations
   - Synergy for Haiku is only a Synergy client at this time
-  - For now, client name is always "haiku"
   - SSL / TLS is not currently supported and must be disabled on the server
   - Copy / Paste feature have some issues
 
