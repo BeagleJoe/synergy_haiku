@@ -9,7 +9,7 @@ Synergy allows a central machine running the Synergy server to share its Keyboar
 ## Release notes 0.3-1
   - Fixed x86-64
   - enabel/disable copy&paste feature
-  - Key Mapping (cntrl+alt+arrows) for x11
+  - Bugs in Key Mapping (cntrl+alt+arrows) for x11
   - sticky keys
 
 ## Now Package available:
@@ -17,7 +17,6 @@ Package available: https://depot.haiku-os.org/ or in HaikuDepot app.
 
 ## Limitations
   - Synergy for Haiku is only a Synergy client at this time
-  - Some minor bugs still exist in the keymap translation
   - For now, client name is always "haiku"
   - SSL / TLS is not currently supported and must be disabled on the server
   - Copy / Paste feature have some issues
