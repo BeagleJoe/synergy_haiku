@@ -22,7 +22,7 @@ Package available: https://depot.haiku-os.org/ or in HaikuDepot app.
   - Copy / Paste feature have some issues
 
 ## Compiling
-Simply run ```make``` under Haiku (x86 and x86-68 tested)
+Simply run ```make``` under Haiku (x86 and x86-64 tested)
 
 ## Configuration
   Create a configuration file at ```~/config/settings/synergy```
