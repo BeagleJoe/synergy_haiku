@@ -37,7 +37,7 @@ Simply run ```make``` under Haiku (x86 and x86-64 tested)
   * **server**: Server address
   * **server_keymap**: Keymap of the Synergy Server (X11|AT)
   * **client_name**: Name of client (string, "haiku" default)
-  * **enableCLipboard**: Enable/Disable copy paste feature (false recomended / true as default)
+  * **enableCLipboard**: Enable/Disable copy paste feature (false recomended / false as default)
   
 ## Manual Installation
 Copy the synergy_client input add-on to the non-packaged add-ons directory ```~/config/non-packaged/add-ons/input_server/devices/```
