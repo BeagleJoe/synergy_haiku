@@ -87,9 +87,11 @@ class uSynergyInputServerDevice : public BHandler, public BInputServerDevice {
 		uint32				fControlKey;
 		char*				fFilename;
 		bool				fEnableSynergy;
+		bool				fUseBarrier;
 		BString				fServerKeymap;
 		BString				fServerAddress;
 		BString				fClientName;
+		BString				fMessageName;
 		bool				fEnableCLipboard;
 
 	volatile bool			fUpdateSettings;

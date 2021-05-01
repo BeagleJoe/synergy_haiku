@@ -18,19 +18,20 @@ Package available: https://depot.haiku-os.org/ or in HaikuDepot app.
 ## Limitations
   - Synergy for Haiku is only a Synergy client
   - SSL / TLS is not currently supported and must be disabled on the server
-  - Copy / Paste feature have some issues; disable it is recommended 
+  - Copy / Paste feature have some issues; disable it is recommended
 
 ## Compiling
 Simply run ```make``` under Haiku (x86 and x86-64 tested)
 
 ## Configuration
   Create a configuration file at ```~/config/settings/synergy```
-  
+
   ```ini
   enable = true
   server = 192.168.1.101
   server_keymap = "X11"
   enableCLipboard = false
+  use_barrier = false
   ```
 ### Options
   * **enable**: Enable the client (true|false)
@@ -38,7 +39,8 @@ Simply run ```make``` under Haiku (x86 and x86-64 tested)
   * **server_keymap**: Keymap of the Synergy Server (X11|AT)
   * **client_name**: Name of client (string, "haiku" default)
   * **enableCLipboard**: Enable/Disable copy paste feature (false recomended / false as default)
-  
+  * **use_barrier**: use Barrier(true|false)
+
 ## Manual Installation
 Copy the synergy_client input add-on to the non-packaged add-ons directory ```~/config/non-packaged/add-ons/input_server/devices/```
 
@@ -55,4 +57,5 @@ Thanks to all of those individuals who have made major contributions to Synergy 
 * Jessica Hamilton (wrapper)
 * Ed Robbins (wrapper)
 * Nahuel Tello (fixes & hpkg)
+
 

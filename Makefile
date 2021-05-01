@@ -20,9 +20,9 @@ APP_MIME_SIG =
 #	The following lines tell Pe and Eddie where the SRCS, RDEFS, and RSRCS are
 #	so that Pe and Eddie can fill them in for you.
 #%{
-# @src->@ 
+# @src->@
 
-#	Specify the source files to use. Full paths or paths relative to the 
+#	Specify the source files to use. Full paths or paths relative to the
 #	Makefile can be included. All files, regardless of directory, will have
 #	their object files created in the common object directory. Note that this
 #	means this Makefile will not work correctly if two source files with the
@@ -39,7 +39,7 @@ RDEFS = SynergyHaiku.rdef
 RSRCS =
 
 # End Pe/Eddie support.
-# @<-src@ 
+# @<-src@
 #%}
 
 #	Specify libraries to link against.

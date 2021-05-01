@@ -27,7 +27,8 @@ freely, subject to the following restrictions:
 #include <stdio.h>
 #include <string.h>
 
-
+//const char* messageName = "Synergy";
+//const char* messageName = "Barrier";
 
 //---------------------------------------------------------------------------------------------------------------------
 //	Internal helpers
@@ -206,12 +207,12 @@ static void sSendJoystickCallback(uSynergyContext *context, uint8_t joyNum)
 static void sProcessMessage(uSynergyContext *context, const uint8_t *message)
 {
 	// We have a packet!
-	if (memcmp(message+4, "Synergy", 7)==0)
+	if (memcmp(message+4, context->m_messageName, 7)==0)
 	{
 		// Welcome message
 		//		kMsgHello			= "Synergy%2i%2i"
 		//		kMsgHelloBack		= "Synergy%2i%2i%s"
-		sAddString(context, "Synergy");
+		sAddString(context, context->m_messageName);
 		sAddUInt16(context, USYNERGY_PROTOCOL_MAJOR);
 		sAddUInt16(context, USYNERGY_PROTOCOL_MINOR);
 		sAddUInt32(context, (uint32_t)strlen(context->m_clientName));
@@ -420,7 +421,7 @@ static void sProcessMessage(uSynergyContext *context, const uint8_t *message)
 			uint32_t format	= sNetToNative32(parse_msg);
 			uint32_t size	= sNetToNative32(parse_msg+4);
 			parse_msg += 8;
-			
+
 			// Call callback
 			if (context->m_clipboardCallback)
 				context->m_clipboardCallback(context->m_cookie, format, parse_msg, size);
@@ -428,11 +429,22 @@ static void sProcessMessage(uSynergyContext *context, const uint8_t *message)
 			parse_msg += size;
 		}
 	}
+	else if (USYNERGY_IS_PACKET("CBYE"))
+	{
+		// Server shutting down
+		//		kMsgCClose 			= "CBYE"
+		sTrace(context, "Server disconnecting");
+	}
+	else if (USYNERGY_IS_PACKET("EUNK"))
+	{
+		// Client is Unknown
+		//		kMsgEUnknown		= "EUNK"
+		sTrace(context, "Client is unknown to server");
+	}
 	else
 	{
 		// Unknown packet, could be any of these
 		//		kMsgCNoop 			= "CNOP"
-		//		kMsgCClose 			= "CBYE"
 		//		kMsgCClipboard 		= "CCLP%1i%4i"
 		//		kMsgCScreenSaver 	= "CSEC%1i"
 		//		kMsgDKeyRepeat		= "DKRP%2i%2i%2i%2i"
@@ -440,7 +452,6 @@ static void sProcessMessage(uSynergyContext *context, const uint8_t *message)
 		//		kMsgDMouseRelMove	= "DMRM%2i%2i"
 		//		kMsgEIncompatible	= "EICV%2i%2i"
 		//		kMsgEBusy 			= "EBSY"
-		//		kMsgEUnknown		= "EUNK"
 		//		kMsgEBad			= "EBAD"
 		char buffer[64];
 		sprintf(buffer, "Unknown packet '%c%c%c%c'", message[4], message[5], message[6], message[7]);
@@ -596,7 +607,6 @@ void uSynergyUpdate(uSynergyContext *context)
 }
 
 
-
 /**
 @brief Send clipboard data
 **/
@@ -612,7 +622,7 @@ void uSynergySendClipboard(uSynergyContext *context, const char *text)
 								4 +					/* Clipboard format */
 								4;					/* Clipboard data length */
 	uint32_t max_length = USYNERGY_REPLY_BUFFER_SIZE - overhead_size;
-	
+
 	// Clip text to max length
 	uint32_t text_length = (uint32_t)strlen(text);
 	if (text_length > max_length)
