@@ -33,6 +33,7 @@
 #include <Screen.h>
 #include <TranslationUtils.h>
 
+#include <stdio.h>
 #include <cstdlib>
 #include <strings.h>
 #include <errno.h>
@@ -49,7 +50,6 @@
 
 
 #include "haiku-usynergy.h"
-
 
 #define TRACE_SYNERGY_DEVICE
 #ifdef TRACE_SYNERGY_DEVICE
@@ -94,7 +94,7 @@ static uSynergyBool uReceive(uSynergyCookie cookie, uint8* buffer, int maxLength
 	uSynergyInputServerDevice* device = (uSynergyInputServerDevice*)cookie;
 	if ((uSynergyInputServerDevice*)device->Receive(buffer, maxLength, outLength))
 		return USYNERGY_TRUE;
-	return USYNERGY_FALSE; 
+	return USYNERGY_FALSE;
 }
 
 static void uSleep(uSynergyCookie cookie, int milliseconds)
@@ -179,6 +179,7 @@ uSynergyInputServerDevice::uSynergyInputServerDevice()
 	fContext->m_joystickCallback		= uJoystickCallback;
 	fContext->m_clipboardCallback		= uClipboardCallback;
 	fContext->m_clientName				= fClientName;
+	fContext->m_messageName				= fMessageName;
 	fContext->m_cookie					= (uSynergyCookie)this;
 
 	BRect screenRect = BScreen().Frame();
@@ -255,12 +256,12 @@ void uSynergyInputServerDevice::MessageReceived(BMessage* message)
 				Stop(NULL, NULL);
 			Start(NULL, NULL);
 			break;
-		} 
+		}
 		case B_CLIPBOARD_CHANGED:
 		{
-			// BUG #4735, in old synergy servers the feature returns "ERROR: invalid message from client: DCLP". 
+			// BUG #4735, in old synergy servers the feature returns "ERROR: invalid message from client: DCLP".
 			// Disabled by default.
-			if(fEnableCLipboard == true) 
+			if(fEnableCLipboard == true)
 			{
 				const char *text = NULL;
 				ssize_t len = 0;
@@ -391,10 +392,17 @@ void uSynergyInputServerDevice::_UpdateSettings()
 		return;
 
 	fEnableSynergy = get_driver_boolean_parameter(handle, "enable", false, false);
+	fUseBarrier = get_driver_boolean_parameter(handle, "use_barrier", false, false);
 	fServerKeymap = get_driver_parameter(handle, "server_keymap", NULL, NULL);
 	fServerAddress = get_driver_parameter(handle, "server", NULL, NULL);
 	fClientName = get_driver_parameter(handle, "client_name", DEFAULT_NAME, DEFAULT_NAME);
 	fEnableCLipboard = get_driver_boolean_parameter(handle, "enableCLipboard", false, false); //Get the config variable and set the value. Default is false!
+
+	if (fUseBarrier) {
+		fMessageName = "Barrier";
+	} else {
+		fMessageName = "Synergy";
+	}
 
 	unload_driver_settings(handle);
 }
@@ -454,7 +462,7 @@ bool uSynergyInputServerDevice::Receive(uint8_t *buffer, int maxLength, int* out
 void uSynergyInputServerDevice::Trace(const char *text)
 {
 	BNotification notify(B_INFORMATION_NOTIFICATION);
-	BString group("Synergy");
+	BString group(fMessageName);
 	BString content(text);
 
 	notify.SetGroup(group);
@@ -622,7 +630,7 @@ void uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode, uint16_t _mo
 	}
 	else
 	{
-		Trace("keycode invalid"); 
+		Trace("keycode invalid");
 	}
 
 #if false
@@ -654,17 +662,17 @@ void uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode, uint16_t _mo
 	if (_modifiers & USYNERGY_MODIFIER_SCROLLOCK)
 		modifiers |= B_SCROLL_LOCK;
 
-	bool isLock	= (modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)) != 0;
-	
+	//bool isLock	= (modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)) != 0;
+
 	if (!isKeyRepeat) {
 		if (fModifiers != modifiers) {
 			BMessage* message = new BMessage(B_MODIFIERS_CHANGED);
 			if (message == NULL)
 				return;
-			
+
 			TRACE("synergy: modifiers: 0x%04" B_PRIx32 " & 0x%04" B_PRIx32 "\n",
 				modifiers, fModifiers);
-				
+
 			if (isKeyDown)
 			{
 				modifiers |= fModifiers;
@@ -676,7 +684,7 @@ void uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode, uint16_t _mo
 
 			TRACE("synergy: modifiers changed: 0x%04" B_PRIx32 " => 0x%04"
 				B_PRIx32 "\n", fModifiers, modifiers);
-				
+
 			message->AddInt64("when", timestamp);
 			message->AddInt32("be:old_modifiers", fModifiers);
 			message->AddInt32("modifiers", modifiers);
@@ -687,7 +695,7 @@ void uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode, uint16_t _mo
 			//if (EnqueueMessage(message) != B_OK)
 			//	delete message;
 		}
-	} 
+	}
 
 	if (scancode == 0)
 		return;

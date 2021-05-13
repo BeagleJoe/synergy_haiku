@@ -324,6 +324,7 @@ typedef struct
 	uSynergySleepFunc				m_sleepFunc;									/* Thread sleep function */
 	uSynergyGetTimeFunc				m_getTimeFunc;									/* Get current time function */
 	const char*						m_clientName;									/* Name of Synergy Screen / Client */
+	const char*						m_messageName;									/* Name of the message, "Synergy" or "Barrier" */
 	uint16_t						m_clientWidth;									/* Width of screen */
 	uint16_t						m_clientHeight;									/* Height of screen */
 

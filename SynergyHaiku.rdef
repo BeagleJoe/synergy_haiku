@@ -6,8 +6,8 @@ resource app_version {
 	variety = B_APPV_DEVELOPMENT,
 	internal = 0,
 
-	short_info = "Synergy for Haiku",
-	long_info = "Synergy client input add-on for Haiku"
+	short_info = "Synergy and Barrier for Haiku",
+	long_info = "Synergy/Barrier client input add-on for Haiku"
 };
 
 resource vector_icon {
