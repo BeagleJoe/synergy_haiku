@@ -12,7 +12,7 @@ Synergy / Barrier allows a central machine running the Synergy or Barrier server
   - Bugs in Key Mapping (cntrl+alt+arrows) for x11
   - sticky keys
 
-## Release notes 0.3-2
+## Release notes 0.4
   - Add support for Barrier
   - Add keys support in Key Mapping 
 
