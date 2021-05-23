@@ -404,6 +404,9 @@ void uSynergyInputServerDevice::_UpdateSettings()
 		fMessageName = "Synergy";
 	}
 
+	fContext->m_messageName = fMessageName;
+	fContext->m_clientName = fClientName;
+
 	unload_driver_settings(handle);
 }
 
