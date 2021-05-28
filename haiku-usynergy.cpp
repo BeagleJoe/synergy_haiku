@@ -692,8 +692,8 @@ void uSynergyInputServerDevice::KeyboardCallback(uint16_t scancode, uint16_t _mo
 
 			fModifiers = modifiers;
 
-			//if (EnqueueMessage(message) != B_OK)
-			//	delete message;
+			if (EnqueueMessage(message) != B_OK)
+				delete message;
 		}
 	}
 
